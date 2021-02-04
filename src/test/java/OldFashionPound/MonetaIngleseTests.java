@@ -15,11 +15,11 @@ class MonetaIngleseTests {
 	@Test
     @Order(1)
 	void somma() {
-		MonetaInglese mi1 = new MonetaInglese(5, 17, 8);
+		MonetaInglese mi1 = new MonetaInglese("5p 17s 8d");
 		
-		MonetaInglese mi2 = new MonetaInglese(3, 4, 10);
+		MonetaInglese mi2 = new MonetaInglese("3p 4s 10d");
 		
-		MonetaInglese atteso = new MonetaInglese(9, 2, 6);
+		MonetaInglese atteso = new MonetaInglese("9p 2s 6d");
 		
 		MonetaInglese risultato = mi1.somma(mi2);
 		
@@ -30,11 +30,11 @@ class MonetaIngleseTests {
 	@Test
 	@Order(2)
 	void sottrazione() {
-		MonetaInglese mi1 = new MonetaInglese(5, 17, 8);
+		MonetaInglese mi1 = new MonetaInglese("5p 17s 8d");
 
-		MonetaInglese mi2 = new MonetaInglese(3, 4, 10);
+		MonetaInglese mi2 = new MonetaInglese("3p 4s 10d");
 	
-		MonetaInglese atteso = new MonetaInglese(2, 12, 10);
+		MonetaInglese atteso = new MonetaInglese("2p 12s 10d");
 		
 		MonetaInglese risultato = mi1.sottrazione(mi2);
 		
@@ -45,11 +45,11 @@ class MonetaIngleseTests {
 	@Test
 	@Order(3)
 	void sottrazioneNegativa() {
-		MonetaInglese mi1 = new MonetaInglese(3, 4, 10);
+		MonetaInglese mi1 = new MonetaInglese("3p 4s 10d");
 		
-		MonetaInglese mi2 = new MonetaInglese(5, 17, 8);
+		MonetaInglese mi2 = new MonetaInglese("5p 17s 8d");
 	
-		MonetaInglese atteso = new MonetaInglese(true, 2, 12, 10);
+		MonetaInglese atteso = new MonetaInglese("- 2p 12s 10d");
 		
 		MonetaInglese risultato = mi1.sottrazione(mi2);
 		
@@ -60,10 +60,10 @@ class MonetaIngleseTests {
 	@Test
 	@Order(4)
 	void moltiplicazione() {
-		MonetaInglese mi1 = new MonetaInglese(5, 17, 8);
+		MonetaInglese mi1 = new MonetaInglese("5p 17s 8d");
 		int fattore = 2;
 	
-		MonetaInglese atteso = new MonetaInglese(11, 15, 4);
+		MonetaInglese atteso = new MonetaInglese("11p 15s 4d");
 		
 		MonetaInglese risultato = mi1.moltiplicazione(fattore);
 		
@@ -74,10 +74,10 @@ class MonetaIngleseTests {
 	@Test
 	@Order(5)
 	void divisione1() {
-		MonetaInglese mi1 = new MonetaInglese(5, 17, 8);
+		MonetaInglese mi1 = new MonetaInglese("5p 17s 8d");
 		int dividendo = 3;
 	
-		MonetaInglese atteso = new MonetaInglese(1, 19, 2);
+		MonetaInglese atteso = new MonetaInglese("1p 19s 2d");
 		
 		MonetaInglese risultato = mi1.divisione(dividendo);
 		
@@ -88,10 +88,10 @@ class MonetaIngleseTests {
 	@Test
 	@Order(6)
 	void divisione2() {
-		MonetaInglese mi1 = new MonetaInglese(18, 16, 1);
+		MonetaInglese mi1 = new MonetaInglese("18p 16s 1d");
 		int dividendo = 15;
 	
-		MonetaInglese atteso = new MonetaInglese(1, 5, 0);
+		MonetaInglese atteso = new MonetaInglese("1p 5s 0d");
 		
 		MonetaInglese risultato = mi1.divisione(dividendo);
 
@@ -109,5 +109,12 @@ class MonetaIngleseTests {
 		assertEquals(mi.getPennies(), 1);
 		
 		System.out.println( "parser: " + mi.toString() );
+	}
+	
+	@Test
+	@Order(8)
+	void parserInputFailed() throws Exception {
+		MonetaInglese mi = new MonetaInglese("18 16s 1d");
+		assertEquals(mi.isValida(), false);
 	}
 }

@@ -1,5 +1,6 @@
 package OldFashionPound;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import lombok.Getter;
@@ -7,84 +8,78 @@ import lombok.Setter;
 
 @Getter
 public class MonetaInglese {
-	private static final int fattoreSterlineScellini = 20 * 12;
-	private static final int fattoreScelliniPennies = 12;
+	private static final int FATTORE_STERLINE_SCELLINI = 20 * 12;
+	private static final int FATTORE_SCELLINI_PENNIES = 12;
 	
-	public static MonetaInglese parseFromPennies(int pennies) {
-		boolean negativo = false;
-		if (pennies < 0) {
-			negativo = true;
-			pennies = -pennies;
-		}
-		int newSterline = pennies / fattoreSterlineScellini;
-		int q = pennies % fattoreSterlineScellini;
-		int newScellini = q / fattoreScelliniPennies;
-		int newPennies = q % fattoreScelliniPennies;
-		return new MonetaInglese(negativo, newSterline, newScellini, newPennies);
-	}
-	
+	private boolean valida = false;
 	private boolean negativo;
 	private int sterline;
 	private int scellini;
 	private int pennies;
 	@Setter
 	private int eventualeResto = 0;
-	
-	public MonetaInglese(int sterline, int scellini, int pennies) {
+
+	public MonetaInglese(int penniesTotali) {
 		this.negativo = false;
-		this.sterline = sterline;
-		this.scellini = scellini;
-		this.pennies = pennies;
+		if (penniesTotali < 0) {
+			this.negativo = true;
+			penniesTotali = -penniesTotali;
+		}
+		this.sterline = penniesTotali / FATTORE_STERLINE_SCELLINI;
+		int q = penniesTotali % FATTORE_STERLINE_SCELLINI;
+		this.scellini = q / FATTORE_SCELLINI_PENNIES;
+		this.pennies = q % FATTORE_SCELLINI_PENNIES;
+		this.valida = true;
 	}
 	
-	public MonetaInglese(boolean negativo, int sterline, int scellini, int pennies) {
-		this.negativo = negativo;
-		this.sterline = sterline;
-		this.scellini = scellini;
-		this.pennies = pennies;
-	}
-	
-	public MonetaInglese(String parser) throws Exception {
-		if ( Pattern.matches("^\\d+[p]\s\\d+[s]\s\\d+[d]$", parser) ) {
+	public MonetaInglese(String parser) {
+		if (parser.startsWith("- ")) {
+			this.negativo = true;
+			parser = parser.substring(2);
+		}
+		if ( Pattern.matches("^\\d+[p]\s\\d+[s]\s\\d+[d]$", parser) ) {			
 			this.sterline = Integer.parseInt( parser.split("[p]")[0] );
 			parser = parser.split("[p]")[1].trim();
 			this.scellini = Integer.parseInt( parser.split("[s]")[0] );
 			parser = parser.split("[s]")[1].trim();;
 			this.pennies = Integer.parseInt( parser.split("[d]")[0] );
-		} else {
-			throw new Exception("Invalid parser input");
+			this.valida = true;
 		}
 	}
 	
-	private int convertToPennies() {
-		return ( sterline * fattoreSterlineScellini + scellini * fattoreScelliniPennies + pennies );
+	private int trasformaInPennies() {
+		return ( sterline * FATTORE_STERLINE_SCELLINI + scellini * FATTORE_SCELLINI_PENNIES + pennies );
 	}
 
 	public MonetaInglese somma(MonetaInglese addendo) {
-		int r = this.convertToPennies() + addendo.convertToPennies();
-		return MonetaInglese.parseFromPennies(r);
+		int penniesTotali = this.trasformaInPennies() + addendo.trasformaInPennies();
+		return new MonetaInglese(penniesTotali);
 	}
 	
 	public MonetaInglese sottrazione(MonetaInglese sottraendo) {
-		int r = this.convertToPennies() - sottraendo.convertToPennies();
-		return MonetaInglese.parseFromPennies(r);
+		int penniesTotali = this.trasformaInPennies() - sottraendo.trasformaInPennies();
+		return new MonetaInglese(penniesTotali);
 	}
 	
 	public MonetaInglese moltiplicazione(int fattore) {
-		int m = this.convertToPennies() * fattore;
-		return MonetaInglese.parseFromPennies(m);
+		int penniesTotali = this.trasformaInPennies() * fattore;
+		return new MonetaInglese(penniesTotali);
 	}
 	
 	public MonetaInglese divisione(int dividendo) {
-		int m = this.convertToPennies() / dividendo;
-		MonetaInglese mi = MonetaInglese.parseFromPennies(m);
-		int eventualeResto = this.convertToPennies() % dividendo;
+		int penniesTotali = this.trasformaInPennies() / dividendo;
+		MonetaInglese mi = new MonetaInglese(penniesTotali);
+		int eventualeResto = this.trasformaInPennies() % dividendo;
 		if (eventualeResto > 0) {
 			mi.setEventualeResto(eventualeResto);
 		}
 		return mi;
 	}
 	
+	@Override
+	public int hashCode() {
+		return Objects.hash(negativo, sterline, scellini, pennies);
+	}
 	
 	@Override
 	public String toString() {
